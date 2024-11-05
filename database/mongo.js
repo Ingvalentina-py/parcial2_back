@@ -17,7 +17,7 @@ const connectDb = async () => {
     if (!db) { // Solo intenta conectarse si no hay una conexión existente
         try {
             await client.connect();
-            db = client.db('margarita'); // Cambia 'margarita' por el nombre de tu base de datos
+            db = client.db('test'); // Cambia 'margarita' por el nombre de tu base de datos
             console.log('Se conectó a MongoDB');
         } catch (error) {
             console.error('Error al conectar a MongoDB:', error);
