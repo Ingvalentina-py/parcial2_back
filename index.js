@@ -1,34 +1,40 @@
 const express = require('express');
 const { urlencoded, json } = require('express');
-const pool = require('./database/mongo');
-const router = require('./routes/margarita.routes.js');
 const cors = require('cors');
+const router = require('./routes/userRoutes');
+const { connectDb } = require('./config/db'); // Importa connectDb
 require('dotenv').config();
-
 
 const app = express();
 
-// Middleware para analizar datos codificados y JSON
+// Configuración de CORS
+const corsOptions = {
+    origin: 'https://parcial-front-jade.vercel.app', // Cambia a tu URL de frontend en Vercel
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
+
+app.use(cors(corsOptions)); // Aplica el middleware de CORS una vez
+
+// Middleware para procesar JSON y URL-encoded
+app.use(express.json());
 app.use(urlencoded({ extended: true }));
-app.use(json());
-app.use(cors());
 
-// Manejador para la ruta raíz
+// Ruta raíz
 app.get('/', (req, res) => {
-    res.send('Bienvenido al backend de Kevin!');
+    res.send("API en funcionamiento");
 });
 
-// Manejador para la ruta GET que imprime un mensaje
-app.get('/v1/signos', (req, res, next) => {
-    console.log('Estás en el backend de Kevin');
-    next();
-});
+// Rutas de usuario
+app.use('/api/users', router);
 
-// Usar el router para las rutas relacionadas con 'margarita'
-app.use('/v1/margarita', router);
-
-// Iniciar el servidor
-const port = process.env.PORT || 4000;
-app.listen(port, () => {
-    console.log(`Servidor corriendo en el puerto ${port}`);
+// Conectar a la base de datos y iniciar el servidor
+connectDb().then(() => {
+    const port = process.env.PORT || 4000;
+    app.listen(port, () => {
+        console.log(`Servidor corriendo en el puerto ${port}`);
+    });
+}).catch((error) => {
+    console.error("Error al iniciar el servidor:", error);
 });
